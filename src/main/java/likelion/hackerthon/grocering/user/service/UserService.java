@@ -2,7 +2,9 @@ package likelion.hackerthon.grocering.user.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import likelion.hackerthon.grocering.user.dto.UserPreferences;
 import likelion.hackerthon.grocering.user.entity.User;
+import likelion.hackerthon.grocering.user.exceptions.UserNotFoundException;
 import likelion.hackerthon.grocering.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,5 +30,15 @@ public class UserService {
 
         user.setGuestId(guestId);
         return guestId;
+    }
+
+    @Transactional
+    public void savePreferences(UserPreferences preferences, Long userId) {
+        User user = getUserById(userId);
+        user.setPreferences(preferences);
+    }
+
+    private User getUserById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
     }
 }

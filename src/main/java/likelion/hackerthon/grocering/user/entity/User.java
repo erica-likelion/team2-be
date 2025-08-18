@@ -1,6 +1,7 @@
 package likelion.hackerthon.grocering.user.entity;
 
 import jakarta.persistence.*;
+import likelion.hackerthon.grocering.user.dto.UserPreferences;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,4 +37,15 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<Recipe> recipes = new ArrayList<>();
+
+    public void setPreferences(UserPreferences preferences) {
+        this.hotFoodPreference = preferences.hotFoodPreference();
+        this.sweetFoodPreference = preferences.sweetFoodPreference();
+        this.saltyFoodPreference = preferences.saltyFoodPreference();
+        this.cookingMethodFoodPreference = preferences.cookingMethodFoodPreference();
+        this.maxCookingTimePreference = preferences.maxCookingTimePreference();
+        this.tryingNewFoodPreference = preferences.tryingNewFoodPreference();
+        this.allergicFoods = preferences.allergicFoods();
+        this.religionBannedFoods = preferences.religionBannedFoods();
+    }
 }
