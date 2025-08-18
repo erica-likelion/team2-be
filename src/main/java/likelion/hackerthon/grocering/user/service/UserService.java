@@ -38,6 +38,24 @@ public class UserService {
         user.setPreferences(preferences);
     }
 
+    public void renewSession(HttpServletRequest request, String guestId) {
+        User user = getUserByGuestId(guestId);
+
+        HttpSession oldSession = request.getSession(false);
+
+        if (oldSession != null) {
+            oldSession.invalidate();
+        }
+
+        HttpSession newSession = request.getSession(true);
+        newSession.setAttribute("guestId", user.getGuestId());
+        newSession.setAttribute("userId", user.getId());
+    }
+
+    private User getUserByGuestId(String guestId) {
+        return userRepository.findByGuestId(guestId).orElseThrow(UserNotFoundException::new);
+    }
+
     private User getUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
     }

@@ -1,6 +1,7 @@
 package likelion.hackerthon.grocering.user.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import likelion.hackerthon.grocering.user.dto.GuestIdData;
 import likelion.hackerthon.grocering.user.dto.UserPreferences;
 import likelion.hackerthon.grocering.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -25,5 +26,11 @@ public class UserController {
                                                       @SessionAttribute(name = "userId", required = true) String userId) {
         userService.savePreferences(userPreferences, Long.valueOf(userId));
         return ResponseEntity.ok("save user preferences");
+    }
+
+    @PostMapping("/renew/session")
+    public String renewSession(@RequestBody GuestIdData guestIdData, HttpServletRequest request) {
+        userService.renewSession(request, guestIdData.guestId());
+        return "renew session";
     }
 }
