@@ -51,17 +51,8 @@ public class RecipeRecommendationService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("매운맛 선호: ").append(user.getHotFoodPreference()).append(", ");
-        sb.append("단맛 선호: ").append(user.getSweetFoodPreference()).append(", ");
-        sb.append("짠맛 선호: ").append(user.getSaltyFoodPreference()).append(", ");
-        sb.append("선호 조리 방식: ").append(user.getCookingMethodFoodPreference()).append(", ");
-        sb.append("최대 조리 시간: ").append(user.getMaxCookingTimePreference()).append(", ");
-        sb.append("새로운 음식 시도: ").append(user.getTryingNewFoodPreference()).append(", ");
-        sb.append("알레르기 정보: ").append(user.getAllergicFoods()).append(", ");
-        sb.append("종교적 금기 음식: ").append(user.getReligionBannedFoods());
-
-        return sb.toString();
+        // UserPreferences DTO에서 preference 필드를 직접 사용
+        return user.getPreference();
     }
 
     private String getStoreProductsData(Long storeId) {
