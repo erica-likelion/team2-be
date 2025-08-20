@@ -1,30 +1,81 @@
 package likelion.hackerthon.grocering.ai.service;
 
-import com.google.cloud.vertexai.api.GenerateContentResponse;
-import com.google.cloud.vertexai.api.GenerativeModel;
-import com.google.cloud.vertexai.generativeai.ResponseHandler;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
-import java.io.IOException;
+import java.util.Collections;
+import java.util.Map;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class GeminiService {
 
-    private final GenerativeModel generativeModel;
+    private final WebClient geminiWebClient;
+    private final ObjectMapper objectMapper;
+
+    @Value("${google.ai.api-key}")
+    private String apiKey;
+
+    @Value("${google.ai.model}")
+    private String model;
 
     public String generateRecipeRecommendation(String userOnboardingData, String storeProducts) {
         String prompt = buildRecipePrompt(userOnboardingData, storeProducts);
 
         try {
-            GenerateContentResponse response = generativeModel.generateContent(prompt);
-            return ResponseHandler.getText(response);
-        } catch (IOException e) {
+            // Gemini API 요청 바디 구성
+            Map<String, Object> requestBody = Map.of(
+                "contents", Collections.singletonList(
+                    Map.of("parts", Collections.singletonList(
+                        Map.of("text", prompt)
+                    ))
+                )
+            );
+
+            // REST API 호출
+            String response = geminiWebClient
+                .post()
+                .uri("/v1/models/{model}:generateContent?key={apiKey}", model, apiKey)
+                .bodyValue(requestBody)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+
+            return extractTextFromResponse(response);
+
+        } catch (Exception e) {
             log.error("Gemini AI 호출 중 오류 발생", e);
             throw new RuntimeException("AI 레시피 추천 생성에 실패했습니다.", e);
+        }
+    }
+
+    private String extractTextFromResponse(String jsonResponse) {
+        try {
+            JsonNode root = objectMapper.readTree(jsonResponse);
+            JsonNode candidates = root.path("candidates");
+            
+            if (candidates.isArray() && candidates.size() > 0) {
+                JsonNode firstCandidate = candidates.get(0);
+                JsonNode content = firstCandidate.path("content");
+                JsonNode parts = content.path("parts");
+                
+                if (parts.isArray() && parts.size() > 0) {
+                    return parts.get(0).path("text").asText();
+                }
+            }
+            
+            return "레시피 추천을 생성할 수 없습니다.";
+            
+        } catch (Exception e) {
+            log.error("AI 응답 파싱 중 오류 발생", e);
+            return "AI 응답을 처리할 수 없습니다.";
         }
     }
 

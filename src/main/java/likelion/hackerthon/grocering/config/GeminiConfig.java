@@ -1,29 +1,21 @@
 package likelion.hackerthon.grocering.config;
 
-import com.google.cloud.vertexai.VertexAI;
-import com.google.cloud.vertexai.api.GenerativeModel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.io.IOException;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class GeminiConfig {
-
-    @Value("${google.ai.project-id}")
-    private String projectId;
-
-    @Value("${google.ai.location}")
-    private String location;
-
-    @Value("${google.ai.model-name}")
-    private String modelName;
-
+    
+    @Value("${google.ai.base-url}")
+    private String baseUrl;
+    
     @Bean
-    public GenerativeModel generativeModel() throws IOException {
-        try (VertexAI vertexAI = new VertexAI(projectId, location)) {
-            return new GenerativeModel(modelName, vertexAI);
-        }
+    public WebClient geminiWebClient() {
+        return WebClient.builder()
+                .baseUrl(baseUrl)
+                .defaultHeader("Content-Type", "application/json")
+                .build();
     }
 }
