@@ -26,7 +26,7 @@ public class GuestAuthenticationFilter implements Filter {
         String path = httpRequest.getRequestURI();
 
         for (String whiteList : WHITELIST) {
-            if (path.equals(whiteList)) {
+            if (path.equals(whiteList) || path.startsWith("/swagger")) {
                 filterChain.doFilter(servletRequest, servletResponse);
                 return;
             }
