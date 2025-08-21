@@ -24,10 +24,10 @@ public class RecipeRecommendationService {
     private final ProductRepository productRepository;
     private final ObjectMapper objectMapper;
 
-    public RecipeRecommendationResponse generateRecommendations(RecipeRecommendationRequest request) {
+    public RecipeRecommendationResponse generateRecommendations(RecipeRecommendationRequest request, Long userId) {
         try {
             // 1. 사용자 온보딩 데이터 가져오기
-            String userOnboardingData = getUserOnboardingData(request.getUserId());
+            String userOnboardingData = getUserOnboardingData(userId);
 
             // 2. 식료품점 상품 데이터 가져오기
             String storeProducts = getStoreProductsData(request.getStoreId());
@@ -38,12 +38,24 @@ public class RecipeRecommendationService {
             // 4. Gemini AI 호출
             String aiResponse = geminiService.generateRecipeRecommendation(enhancedUserData, storeProducts);
 
-            // 5. JSON 응답 파싱
-            return parseAIResponse(aiResponse);
+            // 5. 간단한 응답 구조로 반환 (JSON 파싱 없이)
+            RecipeRecommendationResponse response = new RecipeRecommendationResponse();
+            RecipeRecommendationResponse.RecommendedRecipe recipe = new RecipeRecommendationResponse.RecommendedRecipe();
+            recipe.setName("AI 추천 레시피");
+            recipe.setDescription(aiResponse); // AI 응답 전체를 description에 담기
+            response.setRecipes(List.of(recipe));
+            return response;
 
         } catch (Exception e) {
             log.error("레시피 추천 생성 중 오류 발생", e);
-            throw new RuntimeException("레시피 추천 생성에 실패했습니다.", e);
+            
+            // 오류 발생 시 기본 응답 반환
+            RecipeRecommendationResponse fallbackResponse = new RecipeRecommendationResponse();
+            RecipeRecommendationResponse.RecommendedRecipe fallbackRecipe = new RecipeRecommendationResponse.RecommendedRecipe();
+            fallbackRecipe.setName("서비스 오류");
+            fallbackRecipe.setDescription("레시피 추천 서비스에 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+            fallbackResponse.setRecipes(List.of(fallbackRecipe));
+            return fallbackResponse;
         }
     }
 
@@ -73,12 +85,4 @@ public class RecipeRecommendationService {
         return userOnboardingData;
     }
 
-    private RecipeRecommendationResponse parseAIResponse(String aiResponse) {
-        try {
-            return objectMapper.readValue(aiResponse, RecipeRecommendationResponse.class);
-        } catch (Exception e) {
-            log.error("AI 응답 파싱 실패: {}", aiResponse, e);
-            throw new RuntimeException("AI 응답을 처리할 수 없습니다.", e);
-        }
-    }
 }
