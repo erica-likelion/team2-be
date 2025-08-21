@@ -14,7 +14,8 @@ import java.util.List;
 public class GuestAuthenticationFilter implements Filter {
     private final List<String> WHITELIST = Arrays.asList(
             "/guest/session",
-            "/renew/session"
+            "/renew/session",
+            "/swagger-ui/index.html"
     );
 
     @Override
@@ -26,7 +27,7 @@ public class GuestAuthenticationFilter implements Filter {
         String path = httpRequest.getRequestURI();
 
         for (String whiteList : WHITELIST) {
-            if (path.equals(whiteList)) {
+            if (path.equals(whiteList)|| path.startsWith("/swagger")) {
                 filterChain.doFilter(servletRequest, servletResponse);
                 return;
             }
