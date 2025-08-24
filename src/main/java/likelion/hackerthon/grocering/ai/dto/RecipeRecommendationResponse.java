@@ -25,6 +25,9 @@ public class RecipeRecommendationResponse {
         @Schema(description = "조리시간 (분 단위)", example = "30")
         private Integer cookingTime;
         
+        @Schema(description = "요리 썸네일 이미지 URL", example = "https://someimgcdn.com/recipe/korean/kimchi-jjigae.webp")
+        private String thumbnail;
+        
         @Schema(description = "필요한 재료 목록")
         private List<RecipeIngredient> ingredients;
         
