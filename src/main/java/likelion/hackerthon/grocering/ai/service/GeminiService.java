@@ -85,9 +85,12 @@ public class GeminiService {
             // Gemini 응답에서 텍스트 추출
             String aiResponseText = extractTextFromResponse(jsonResponse);
             
+            // 마크다운 코드블록 제거 (```json ... ``` 또는 ``` ... ```)
+            String cleanedJson = cleanMarkdownCodeBlocks(aiResponseText);
+            
             // AI가 반환한 JSON 텍스트를 파싱
             RecipeRecommendationResponse.RecommendedRecipe recipe = objectMapper.readValue(
-                aiResponseText, RecipeRecommendationResponse.RecommendedRecipe.class
+                cleanedJson, RecipeRecommendationResponse.RecommendedRecipe.class
             );
             
             return recipe;
@@ -110,6 +113,34 @@ public class GeminiService {
         }
     }
 
+    private String cleanMarkdownCodeBlocks(String text) {
+        if (text == null || text.trim().isEmpty()) {
+            return text;
+        }
+        
+        // 마크다운 코드블록 패턴 제거
+        String cleaned = text.trim();
+        
+        // ```json ... ``` 또는 ``` ... ``` 패턴 제거
+        if (cleaned.startsWith("```")) {
+            // 첫 번째 줄 제거 (```json 또는 ```)
+            int firstNewLine = cleaned.indexOf('\n');
+            if (firstNewLine > 0) {
+                cleaned = cleaned.substring(firstNewLine + 1);
+            }
+        }
+        
+        if (cleaned.endsWith("```")) {
+            // 마지막 ``` 제거
+            int lastBackticks = cleaned.lastIndexOf("```");
+            if (lastBackticks > 0) {
+                cleaned = cleaned.substring(0, lastBackticks);
+            }
+        }
+        
+        return cleaned.trim();
+    }
+
     private String buildRecipePrompt(String userOnboardingData, String storeProducts) {
         return String.format("""
             당신은 외국 식료품점의 재료를 활용한 요리 레시피를 추천하는 전문가입니다.
@@ -121,7 +152,9 @@ public class GeminiService {
             %s
 
             위 정보를 바탕으로 사용자가 가장 좋아할 만한 최상의 레시피 1개를 추천하고, 
-            반드시 아래 JSON 형식으로만 응답해주세요. 다른 텍스트는 포함하지 마세요:
+            반드시 아래 JSON 형식으로만 응답해주세요. 
+            
+            중요: 마크다운 코드블록(```)이나 다른 텍스트는 절대 포함하지 말 것. JSON만 반환할 것:
 
             {
               "name": "요리명",
@@ -151,6 +184,8 @@ public class GeminiService {
             4. instructions는 상세하고 단계별로 작성
             5. estimatedPrice는 "1,000원" 형태로 표기
             6. 반드시 유효한 JSON 형식으로만 응답
+            7. 코드블록(```)이나 추가 설명 절대 금지, 오직 JSON만 반환
+            ultrathinking.
             """, userOnboardingData, storeProducts);
     }
 }
