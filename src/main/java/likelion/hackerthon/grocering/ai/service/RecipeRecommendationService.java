@@ -35,14 +35,11 @@ public class RecipeRecommendationService {
             // 3. 추가 요구사항 반영
             String enhancedUserData = enhanceUserDataWithRequirements(userOnboardingData, request.getAdditionalRequirements());
 
-            // 4. Gemini AI 호출
-            String aiResponse = geminiService.generateRecipeRecommendation(enhancedUserData, storeProducts);
+            // 4. Gemini AI 호출 - 구조화된 레시피 객체 반환
+            RecipeRecommendationResponse.RecommendedRecipe recipe = geminiService.generateRecipeRecommendation(enhancedUserData, storeProducts);
 
-            // 5. 간단한 응답 구조로 반환 (JSON 파싱 없이)
+            // 5. 구조화된 응답 반환
             RecipeRecommendationResponse response = new RecipeRecommendationResponse();
-            RecipeRecommendationResponse.RecommendedRecipe recipe = new RecipeRecommendationResponse.RecommendedRecipe();
-            recipe.setName("AI 추천 레시피");
-            recipe.setDescription(aiResponse); // AI 응답 전체를 description에 담기
             response.setRecipes(List.of(recipe));
             return response;
 
@@ -53,6 +50,12 @@ public class RecipeRecommendationService {
             RecipeRecommendationResponse fallbackResponse = new RecipeRecommendationResponse();
             RecipeRecommendationResponse.RecommendedRecipe fallbackRecipe = new RecipeRecommendationResponse.RecommendedRecipe();
             fallbackRecipe.setName("서비스 오류");
+            fallbackRecipe.setCuisine("기타");
+            fallbackRecipe.setDifficulty("보통");
+            fallbackRecipe.setCookingTime(30);
+            fallbackRecipe.setThumbnail("https://images.unsplash.com/photo-1546833999-b9f581a1996d");
+            fallbackRecipe.setIngredients(List.of());
+            fallbackRecipe.setInstructions(List.of("레시피 추천 서비스에 오류가 발생했습니다. 잠시 후 다시 시도해주세요."));
             fallbackRecipe.setDescription("레시피 추천 서비스에 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
             fallbackResponse.setRecipes(List.of(fallbackRecipe));
             return fallbackResponse;
