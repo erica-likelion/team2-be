@@ -39,7 +39,7 @@ public class GeminiService {
                     ))
                 ),
                 "generationConfig", Map.of(
-                    "temperature", 0.9,  // 창의성 증가 (0.0~1.0)
+                    "temperature", 0.6,  // 창의성 증가 (0.0~1.0)
                     "topP", 0.8,         // 다양성 증가
                     "topK", 40,          // 선택 폭 증가
                     "maxOutputTokens", 2048
@@ -157,8 +157,8 @@ public class GeminiService {
             현재 식료품점 판매 상품:
             %s
 
-            위 정보를 바탕으로 사용자가 가장 좋아할 만한 창의적이고 다양한 최상의 레시피 1개를 추천하고, 
-            매번 다른 레시피를 제안해주세요. 반드시 아래 JSON 형식으로만 응답해주세요. 
+            위 정보를 바탕으로 사용자가 가장 좋아할 만한 창의적이고 다양한 레시피 1개를 추천하고, 
+            **매번 다른 레시피를 제안**해주세요. 반드시 아래 JSON 형식으로만 응답해주세요. 
             
             중요: 마크다운 코드블록(```)이나 다른 텍스트는 절대 포함하지 말 것. JSON만 반환할 것:
 
@@ -184,13 +184,22 @@ public class GeminiService {
             }
 
             요구사항:
-            1. 해당 식료품점에서 구매 가능한 재료만 사용
-            2. 사용자 선호도를 충분히 반영
-            3. thumbnail은 적절한 이미지 URL 생성 (https://www.google.com/search?tbm=isch&q=* 형태로)
-            4. instructions는 상세하고 단계별로 작성
-            5. estimatedPrice는 "1,000원" 형태로 표직기
-            6. 반드시 유효한 JSON 형식으로만 응답
-            7. 코드블록(```)이나 추가 설명 절대 금지, 오 JSON만 반환
+            1. 사용자 선호도를 충분히 반영
+            2. thumbnail은 다음 링크 중에 생성된 레시피와 가장 연관성 높은 이미지로 리턴할 것. 만약 연관성이 없다면 `null`로 리턴할 것:
+                1. "https://raw.githubusercontent.com/erica-likelion/team2-fe/refs/heads/main/public/sample_food_imgs/Thai_Coconut_Shin_Ramyun_Stir_Fry.jpeg"
+                2. "https://raw.githubusercontent.com/erica-likelion/team2-fe/refs/heads/main/public/sample_food_imgs/Pesto_Mie_Goreng_Pasta.jpeg"
+                3. "https://raw.githubusercontent.com/erica-likelion/team2-fe/refs/heads/main/public/sample_food_imgs/Lamb_Shashlik_Kefir_Marinated.jpeg"
+                4. https://raw.githubusercontent.com/erica-likelion/team2-fe/refs/heads/main/public/sample_food_imgs/Bun_Cha.jpeg
+                5. https://raw.githubusercontent.com/erica-likelion/team2-fe/refs/heads/main/public/sample_food_imgs/Lamb_Hummus_Pita.jpeg
+                6. https://raw.githubusercontent.com/erica-likelion/team2-fe/refs/heads/main/public/sample_food_imgs/Kielbasa_Buckwheat_Stir_Fry.jpeg
+                7. https://raw.githubusercontent.com/erica-likelion/team2-fe/refs/heads/main/public/sample_food_imgs/Mala_Hot_Pot_Dumpling_Soup.jpeg
+                8. https://raw.githubusercontent.com/erica-likelion/team2-fe/refs/heads/main/public/sample_food_imgs/Dal_Makhani.jpeg
+                9. https://raw.githubusercontent.com/erica-likelion/team2-fe/refs/heads/main/public/sample_food_imgs/Pancit_Canton_Chicharon.jpeg
+                10. https://raw.githubusercontent.com/erica-likelion/team2-fe/refs/heads/main/public/sample_food_imgs/Jalapeno_Guacamole_Taco.jpeg
+            3. instructions는 상세하고 단계별로 작성
+            4. estimatedPrice는 "1,000원" 형태로 표기
+            5. 반드시 유효한 JSON 형식으로만 응답
+            6. 코드블록(```)이나 추가 설명 절대 금지, 오직 JSON만 반환
             ultrathinking.
             """, userOnboardingData, storeProducts);
     }
