@@ -126,8 +126,7 @@ public class GeminiService {
         
         // 마크다운 코드블록 패턴 제거
         String cleaned = text.trim();
-        
-        // 마크다운 코드 블록 패턴 제거
+
         if (cleaned.startsWith("```")) {
             // 첫 번째 줄 제거 (```json 또는 ```)
             int firstNewLine = cleaned.indexOf('\n');
@@ -187,11 +186,11 @@ public class GeminiService {
             요구사항:
             1. 해당 식료품점에서 구매 가능한 재료만 사용
             2. 사용자 선호도를 충분히 반영
-            3. thumbnail은 적절한 이미지 URL 생성 (https://images.unsplash.com/photo-* 형태로)
+            3. thumbnail은 적절한 이미지 URL 생성 (https://www.google.com/search?tbm=isch&q=* 형태로)
             4. instructions는 상세하고 단계별로 작성
-            5. estimatedPrice는 "1,000원" 형태로 표기
+            5. estimatedPrice는 "1,000원" 형태로 표직기
             6. 반드시 유효한 JSON 형식으로만 응답
-            7. 코드블록(```)이나 추가 설명 절대 금지, 오직 JSON만 반환
+            7. 코드블록(```)이나 추가 설명 절대 금지, 오 JSON만 반환
             ultrathinking.
             """, userOnboardingData, storeProducts);
     }
