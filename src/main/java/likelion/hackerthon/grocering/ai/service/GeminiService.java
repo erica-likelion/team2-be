@@ -37,6 +37,12 @@ public class GeminiService {
                     Map.of("parts", Collections.singletonList(
                         Map.of("text", prompt)
                     ))
+                ),
+                "generationConfig", Map.of(
+                    "temperature", 0.9,  // 창의성 증가 (0.0~1.0)
+                    "topP", 0.8,         // 다양성 증가
+                    "topK", 40,          // 선택 폭 증가
+                    "maxOutputTokens", 2048
                 )
             );
 
@@ -95,7 +101,7 @@ public class GeminiService {
             
             return recipe;
             
-        } catch (Exception e) {
+        } catch (Exception e) { // fallback
             log.error("AI 응답 파싱 중 오류 발생", e);
             
             // 파싱 실패 시 기본 레시피 반환
@@ -144,7 +150,7 @@ public class GeminiService {
     private String buildRecipePrompt(String userOnboardingData, String storeProducts) {
         return String.format("""
             당신은 외국 식료품점의 재료를 바탕으로 실존하는 외국 요리 레시피를 추천하는 전문가입니다.
-            해당 식료품점에서 판매하지 않는 재료는 표시를 해주세요.
+            해당 식료품점에서 판매하지 않는 재료도 포함하고, 해당 식료품점에는 판매하지 않음을 `ingredients`에만 (미판매) 이런식으로 따로 표시를 해주세요.
             
             사용자 선호도:
             %s
@@ -152,8 +158,8 @@ public class GeminiService {
             현재 식료품점 판매 상품:
             %s
 
-            위 정보를 바탕으로 사용자가 가장 좋아할 만한 최상의 레시피 1개를 추천하고, 
-            반드시 아래 JSON 형식으로만 응답해주세요. 
+            위 정보를 바탕으로 사용자가 가장 좋아할 만한 창의적이고 다양한 최상의 레시피 1개를 추천하고, 
+            매번 다른 레시피를 제안해주세요. 반드시 아래 JSON 형식으로만 응답해주세요. 
             
             중요: 마크다운 코드블록(```)이나 다른 텍스트는 절대 포함하지 말 것. JSON만 반환할 것:
 
