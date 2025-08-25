@@ -121,7 +121,7 @@ public class GeminiService {
         // 마크다운 코드블록 패턴 제거
         String cleaned = text.trim();
         
-        // ```json ... ``` 또는 ``` ... ``` 패턴 제거
+        // 마크다운 코드 블록 패턴 제거
         if (cleaned.startsWith("```")) {
             // 첫 번째 줄 제거 (```json 또는 ```)
             int firstNewLine = cleaned.indexOf('\n');
@@ -143,8 +143,9 @@ public class GeminiService {
 
     private String buildRecipePrompt(String userOnboardingData, String storeProducts) {
         return String.format("""
-            당신은 외국 식료품점의 재료를 활용한 요리 레시피를 추천하는 전문가입니다.
-
+            당신은 외국 식료품점의 재료를 바탕으로 실존하는 외국 요리 레시피를 추천하는 전문가입니다.
+            해당 식료품점에서 판매하지 않는 재료는 표시를 해주세요.
+            
             사용자 선호도:
             %s
 
